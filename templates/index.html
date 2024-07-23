@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>欢迎来到我们的餐厅</h1>
+        <nav>
+            <a href="{{ url_for('menu') }}">菜单</a>
+            <a href="{{ url_for('cart_view') }}">购物车</a>
+            <a href="{{ url_for('admin') }}">管理员页面</a>
+            <a href="{{ url_for('order_status') }}">订单查询</a>
+        </nav>
+    </header>
+    <main>
+        <h2>首页内容</h2>
+        <p>欢迎来到我们的餐厅网站，您可以浏览菜单，添加商品到购物车，进行结账，还可以通过管理员页面管理订单，或通过订单查询页面查看订单状态。</p>
+    </main>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>结账</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background: #333;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .cart-items {
+            list-style: none;
+            padding: 0;
+        }
+
+        .cart-items li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 15px;
+            border: #ddd 1px solid;
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-items img {
+            max-width: 120px;
+            margin-right: 20px;
+            border-radius: 5px;
+        }
+
+        .cart-items h2 {
+            margin: 0;
+        }
+
+        .cart-items p {
+            margin: 5px 0;
+        }
+
+        .checkout-form {
+            margin-top: 20px;
+        }
+
+        .checkout-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .checkout-form input, .checkout-form textarea, .checkout-form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .checkout-form button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background: #333;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .checkout-form button:hover {
+            background: #555;
+        }
+
+        .payment-image {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .payment-image img {
+            max-width: 100%;
+            height: auto;
+            border: #ddd 1px solid;
+            border-radius: 5px;
+        }
+
+        .back-to-cart {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background: #fff;
+        }
+
+        .back-to-cart:hover {
+            background: #f4f4f4;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>结账</h1>
+    </header>
+
+    <div class="container">
+        <h2>购物车内容</h2>
+        <ul class="cart-items">
+            {% for item in cart %}
+                <li>
+                    <img src="{{ url_for('static', filename='images/' + item.image) }}" alt="{{ item.name }}">
+                    <div>
+                        <h2>{{ item.name }}</h2>
+                        <p>{{ item.description }}</p>
+                        <p>单价: {{ item.price }}元</p>
+                        <p>数量: {{ item.quantity }}</p>
+                        <p>总价: {{ item.price * item.quantity }}元</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <p><strong>总金额: {{ total_price }}元</strong></p>
+        <p><strong>订单号: {{ order_id }}</strong></p>
+
+        <div class="checkout-form">
+            <form action="{{ url_for('checkout') }}" method="post">
+                <label for="name">姓名:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="phone">联系电话:</label>
+                <input type="text" id="phone" name="phone" required>
+
+                <label for="address">地址:</label>
+                <input type="text" id="address" name="address" required>
+
+                <label for="email">邮箱地址:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="notes">备注:</label>
+                <textarea id="notes" name="notes" rows="4"></textarea>
+
+                <label for="payment_method">选择支付方式:</label>
+                <select name="payment_method" id="payment_method" onchange="updatePaymentImage()">
+                    <option value="wechat">微信支付</option>
+                    <option value="alipay">支付宝</option>
+                    <option value="bank">银行卡</option>
+                    <option value="usdt">USDT支付</option>
+                </select>
+
+                <button type="submit">提交订单</button>
+            </form>
+        </div>
+
+        <div class="payment-image">
+            <h2>支付二维码</h2>
+            <img id="payment_image" src="{{ payment_image }}" alt="支付二维码">
+        </div>
+
+        <a href="{{ url_for('cart_view') }}" class="back-to-cart">返回购物车</a>
+    </div>
+    <script>
+        function updatePaymentImage() {
+            var paymentMethod = document.getElementById('payment_method').value;
+            var imageUrl = '';
+            if (paymentMethod === 'wechat') {
+                imageUrl = '{{ url_for("static", filename="images/wechat_pay.png") }}';
+            } else if (paymentMethod === 'alipay') {
+                imageUrl = '{{ url_for("static", filename="images/alipay.png") }}';
+            } else if (paymentMethod === 'bank') {
+                imageUrl = '{{ url_for("static", filename="images/bank_transfer.png") }}';
+            } else if (paymentMethod === 'usdt') {
+                imageUrl = '{{ url_for("static", filename="images/usdt_pay.png") }}';
+            }
+            document.getElementById('payment_image').src = imageUrl;
+        }
+    </script>
+</body>
+</html>

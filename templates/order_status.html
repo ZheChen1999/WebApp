@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单查询</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>订单查询</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">首页</a>
+            <a href="{{ url_for('menu') }}">菜单</a>
+            <a href="{{ url_for('cart_view') }}">购物车</a>
+            <a href="{{ url_for('admin') }}">管理员页面</a>
+        </nav>
+    </header>
+    <main>
+        <form action="{{ url_for('order_status') }}" method="post">
+            <label for="order_id">请输入订单号:</label>
+            <input type="text" id="order_id" name="order_id" required>
+            <button type="submit">查询订单</button>
+        </form>
+
+        {% if order_id %}
+            <h2>订单号: {{ order_id }}</h2>
+            <p>状态: {{ status }}</p>
+        {% endif %}
+    </main>
+</body>
+</html>
